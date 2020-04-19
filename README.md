@@ -8,7 +8,7 @@
 1. 常用的基本技巧
 	+ Git
 	+ Linux命令
-	+ .MD语法入门
+	+ [.MD语法入门](https://github.com/yuanyi2000/learningNotes/blob/master/MD%E8%AF%AD%E6%B3%95%E5%85%A5%E9%97%A8/md%E8%AF%AD%E6%B3%95%E5%85%A5%E9%97%A8.md ".md语法入门")
 	+ 正则表达式
 
 2. 计算机基础知识
