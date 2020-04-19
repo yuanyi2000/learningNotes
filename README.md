@@ -1,3 +1,4 @@
+![](https://img.shields.io/badge/作者-yuanyi-blue)
 # 学习笔记
 
 我将学习时的笔记记录在这里，以便复习和保存
