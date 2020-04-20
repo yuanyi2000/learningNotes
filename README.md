@@ -9,7 +9,7 @@
 	+ [Git](https://github.com/yuanyi2000/learningNotes/blob/master/Git%E7%94%A8%E6%B3%95/git.md "Git")
 	+ Linux命令
 	+ [.MD语法入门](https://github.com/yuanyi2000/learningNotes/blob/master/MD%E8%AF%AD%E6%B3%95%E5%85%A5%E9%97%A8/md%E8%AF%AD%E6%B3%95%E5%85%A5%E9%97%A8.md ".md语法入门")
-	+ 正则表达式
+	+ [正则表达式](https://github.com/cdoco/learn-regex-zh)
 
 2. 计算机基础知识
 	+ 计算机组成原理（《深入理解计算机系统》）
@@ -22,4 +22,4 @@
 	+ Linux高级程序设计
 
 4. JS
-	+ JavaScript高级程序设计
+	+ [JavaScript高级程序设计](https://github.com/yuanyi2000/learningNotes/blob/master/JS/js.md)
