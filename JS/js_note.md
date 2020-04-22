@@ -155,7 +155,7 @@ ECMASript采用C风格注释
 
 在顶部添加如下代码以启用严格模式
 
-`use strict`
+`'use strict'`
 
 #### 3.1.5 语句 ####
 
