@@ -23,3 +23,7 @@
 
 4. JS
 	+ [JavaScript高级程序设计](https://github.com/yuanyi2000/learningNotes/blob/master/JS/js.md)
+
+5. Python
+	+ [廖雪峰老师的python教程](https://www.liaoxuefeng.com/wiki/1016959663602400)
+		* 个人笔记以及代码
