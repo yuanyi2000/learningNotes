@@ -11,6 +11,7 @@ int main(int argc, char const *argv[])
 	ifstream infile("name_of_file");
 	if( ! infile )
 		cerr << "Sorry!We were unable to open input file\n";
+	
 	string word;
 	while(infile >> word)
 		outfile << word << ' ';
