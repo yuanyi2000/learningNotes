@@ -12,5 +12,6 @@ int main()
     sort();
     compact();
     write();
+    
     return 0;
 }
