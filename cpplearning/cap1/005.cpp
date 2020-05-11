@@ -56,7 +56,7 @@ int main(int argc, char const *argv[])
 		// 赋值操作符
 		IntArray& operator = (const IntArray&);
 
-		int size() const;
+		int size() const {return _size};
 		void sort();
 
 		int min() const;
@@ -176,7 +176,7 @@ int main(int argc, char const *argv[])
 			2.返回值
 			3.参数表
 		（一般的，这就是用户所要知道的全部内容）
-		
+
 	*/
 
 
