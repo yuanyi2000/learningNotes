@@ -43,3 +43,4 @@ stats(const int *ia, int size)
 	do_something(pstasts);
 	return pstasts;
 }
+
