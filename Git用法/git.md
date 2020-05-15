@@ -1,9 +1,9 @@
 # 学习Git #
 
-	[廖雪峰老师的Git教程](https://www.liaoxuefeng.com/wiki/896043488029600) 讲的非常好
+[廖雪峰老师的Git教程](https://www.liaoxuefeng.com/wiki/896043488029600) 讲的非常好
 
 
-	[CODING代码托管文档](https://help.coding.net/docs/host/introduce.html) 
+[CODING代码托管文档](https://help.coding.net/docs/host/introduce.html) 
 
 
 - - -
