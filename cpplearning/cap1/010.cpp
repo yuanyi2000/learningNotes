@@ -6,6 +6,7 @@
 using namespace std;
 
 // 标准数组——向量
+<<<<<<< HEAD
 
 // 创建vector对象
 
