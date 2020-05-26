@@ -3,10 +3,12 @@
 #include <fstream>
 #include <vector>
 #include <cassert>
+
+#include <algorithm>  // 包含了泛型算法的头文件
+
 using namespace std;
 
 // 标准数组——向量
-<<<<<<< HEAD
 
 // 创建vector对象
 
@@ -58,4 +60,55 @@ void mumber2()
 		*iter = i;
 	}
 }
+
+
+// 能应用到向量上的泛型算法集
+
+/* 搜索算法 */
+find();
+find_if();
+search();
+binary_search();
+count();
+count_if();
+
+/* 分类排序 */
+sort();
+partial_sort();
+merge();
+partition();
+rotate();
+reverse();
+random_shuffle();
+
+/* 删除 */
+unique();
+remove();
+
+/* 算术 */
+accumulate();
+partial_sum();
+inner_product();
+adjacent_copy();
+difference();
+
+/* 生成和变异 */
+generate();
+fill();
+transformation();
+copy();
+for_each();
+
+/* 关系 */
+equal();
+min();
+max();
+
+
+
+// 泛型算法接受一对迭代器 和 指向内置数组的指针对
+sort(ivec.begin(), ivec.end());
+
+int ia[7] = {10, 9, 7, 5, 3, 7, 1};
+sort(ia, ia+7);
 
