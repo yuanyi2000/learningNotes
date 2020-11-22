@@ -1,10 +1,4 @@
-#include <iostream>
-#include <string>
-#include <vector>
-
-// 头文件回去加
-
-using namespace std;
+#include "std_lib_facilities.h"
 
 // 习题8，2
 void print(vector<int> v,string s)
