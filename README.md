@@ -32,3 +32,6 @@
 	+ [Django笔记](https://github.com/yuanyi2000/learningNotes/tree/master/Python/Django)
 
 6. [C++prime源码示例](https://github.com/yuanyi2000/learningNotes/tree/master/cpplearning)
+
+7. 计算机安全
+	[计算机安全导论 杜文亮](https://github.com/yuanyi2000/learningNotes/blob/master/Computer_Security/readme.md)
