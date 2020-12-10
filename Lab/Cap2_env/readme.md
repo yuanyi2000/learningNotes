@@ -49,3 +49,5 @@ yuan@ubuntu:~/learningNotes/Lab/Cap2_env$ ./vul
 bash-4.4# id
 uid=1000(yuan) gid=1000(yuan) euid=0(root) 组=1000(yuan)
 ```
+
+
