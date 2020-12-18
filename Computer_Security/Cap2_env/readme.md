@@ -1,18 +1,44 @@
-# 第二章实验
+# 第二章 通过环境变量来实现攻击
 
-## 实验1 介绍环境变量
+## 介绍环境变量
 
 environ.c 程序可以打印进程中所有的环境变量
+
+```C
+#include <stdio.h>
+
+extern char ** environ;	// extern提示编译器遇到这个函数或者变量时，在其他模块寻找定义
+
+int main(int argc, char const *argv[], char *envp[])
+{
+	int i = 0;
+	while(environ[i] != NULL){
+		printf("%s\n", environ[i++]);
+	}
+	return 0;
+}
+```
+
 
 
 ## 通过动态连接进行的攻击
 
+
+	动态链接库的风险：
+	在使用动态链接时，程序的一部分代码在编译过程中是不确定的(此时程序员对程序有完全的控制权)，
+	这部分代码被确定下来时是程序运行阶段(此时用户对程序有完全控制权)
+
+
+> LD_PRELOAD LD_LIBRARY_PATH 
+
+
 mytest.c 是一个调用了 sleep()函数的程序，但可通过将sleep.c编译成动态链接库，并export到LD_PRELOAD从而使mytest程序不能正常运行
 
 
-	使mytest成为Set-UID程序之后，会发现在保护机制的保护下仍可正常运行
+使mytest成为Set-UID程序之后，会发现在*保护机制*的保护下仍可正常运行，而不会受到攻击
 
 
+创建共享库的方式：
 ```sh
 	$ gcc -c sleep.c
 	$ gcc -shared -o libmylib.so.1.0.1 sleep.o
@@ -21,7 +47,14 @@ mytest.c 是一个调用了 sleep()函数的程序，但可通过将sleep.c编�
 
 ## 通过外部程序进行的攻击
 
-	由于dash的保护措施，将/bin/sh指向/bin/zsh来保证实验效果
+
+攻击原理：
+
+	system()函数没有提供完整路径时，shell会在PATH环境变量中寻找
+	我们可以修改PATH环境变量，在其中加入我们希望执行的恶意代码
+
+
+> 由于dash的保护措施，将/bin/sh指向/bin/zsh来保证实验效果
 
 ` $ sudo ln -sf /bin/zsh /bin/sh `
 
