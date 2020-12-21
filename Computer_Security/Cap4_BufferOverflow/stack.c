@@ -6,7 +6,6 @@
 int foo(char * str)
 {
 	char buffer[100];
-	printf("buff addr  0x%x\n", (unsigned int)&buffer);
 
 	/* 下面的语句有缓冲区攻击问题 */
 	strcpy(buffer, str);
@@ -15,11 +14,11 @@ int foo(char * str)
 
 int main(int argc, char const *argv[])
 {
-	char str[400];
+	char str[512];
 	FILE *badfile;
 
 	badfile = fopen("badfile", "r");
-	fread(str, sizeof(char), 300, badfile);
+	fread(str, sizeof(char), 500, badfile);
 	foo(str);
 
 	printf("Return Properly\n");
