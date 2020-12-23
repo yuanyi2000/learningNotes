@@ -45,19 +45,78 @@
 
 > 32位字长限制虚拟地址空间为4GB(4千兆字节)，而64位字长使得虚拟地址空间为16EB，大约1.84 × 10^19字节
 
-|	|	|	|	|
-|:-:|:-:|:-:|:-:|
-|	c声明	|  	字节数	|
-|有符号|无符号|32位|64位|
-|char|unsigned char	|1|1|
-|short|unsigned short|2|2|
-|int|unsigned|4|4|
-|long|unsigned long|4|8|
-|int32_t|uint32_t|4|4|
-|int64_t|uint64_t|8|8|
-|char *| |4|8|
-|float| |4|4|
-|double| |8|8|
+<escape>
+<table>
+<thead>
+  <tr>
+    <th colspan="2">C声明</th>
+    <th colspan="2">字节数</th>
+  </tr>
+</thead>
+<tbody>
+  <tr>
+    <td>有符号</td>
+    <td>无符号</td>
+    <td>32位</td>
+    <td>64位</td>
+  </tr>
+  <tr>
+    <td>[signed] char</td>
+    <td>unsigned char</td>
+    <td>1</td>
+    <td>1</td>
+  </tr>
+  <tr>
+    <td>short</td>
+    <td>unsigned short </td>
+    <td>2</td>
+    <td>2</td>
+  </tr>
+  <tr>
+    <td>int</td>
+    <td>unsigned int </td>
+    <td>4</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <td>long</td>
+    <td>unsigned long</td>
+    <td>4</td>
+    <td>8</td>
+  </tr>
+  <tr>
+    <td>int32_t</td>
+    <td>uint32_t</td>
+    <td>4</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <td>int63_t</td>
+    <td>uint64_t</td>
+    <td>8</td>
+    <td>8</td>
+  </tr>
+  <tr>
+    <td>char *</td>
+    <td></td>
+    <td>4</td>
+    <td>8</td>
+  </tr>
+  <tr>
+    <td>float </td>
+    <td></td>
+    <td>4</td>
+    <td>4</td>
+  </tr>
+  <tr>
+    <td>double </td>
+    <td></td>
+    <td>8</td>
+    <td>8</td>
+  </tr>
+</tbody>
+</table>
+</escape>
 
 ### 2.1.3 寻址和字节顺序
 
