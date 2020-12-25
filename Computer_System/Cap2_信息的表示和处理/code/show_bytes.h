@@ -7,7 +7,7 @@ void show_bytes(byte_pointer start, size_t len){  // 输入一个字节序列的
   size_t t;
   for (int i = 0; i < len; ++i)
   {
-    printf(" %.2x\n", start[i]);
+    printf(" %.2x", start[i]);
   }
   printf("\n");
 }
