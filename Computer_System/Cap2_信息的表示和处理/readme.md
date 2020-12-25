@@ -234,3 +234,106 @@ C语言中字符串被编码为一个以null(其值为0)字符结尾的字符数
 
 ### 2.1.7 C语言中的位级运算
 
+
+
+C语言中支持按位布尔运算。
+
+`(a^b)^a = b`
+
+--- 
+练习
+1. ex2.10
+```c
+void inplace_swap(int *x, int *y){
+  *y = *x ^ *y; // step 1
+  *x = *x ^ *y; // step 2
+  *y = *x ^ *y; // step 3
+}
+```
+`*x`和`*y*`的初始值分别为a b，试写出每一步中的这两个位置的值
+
+
+
+|:-:|:-:|:-:|
+|steps|*x|*y|
+| |a|b|
+|s1|a|a^b|
+|s2|a^(a^b)=b|a^b|
+|s3|b|b^(a^b)=a|
+
+
+2. ex2.11
+只适用于偶数个元素数组的首位对调函数
+```c
+void reverse_array(int a[], int cnt){
+  int first, last;
+  for(first = 0, last = cnt - 1;
+      first <= last;
+      first++, last--){
+    inplace_swap(&a[first], &a[last]);
+  }
+}
+```
+改动一下代码
+```c
+void reverse_array(int a[], int cnt){
+  int first, last;
+  for(first = 0, last = cnt - 1;
+      first < last; // 去掉等号条件
+      first++, last--){
+    inplace_swap(&a[first], &a[last])
+  }
+}
+```
+
+
+
+>   位级运算的一个常见用法就是实现*掩码*运算， 这里的掩码是一个位模式，表示从一个字中选出的位集合
+
+3. ex2.12 
+对于下面的值，写出变量x的C语言表达式。 你的代码应该对任何字长w>=8都能工作。 
+例如x = 0x87654321
+ + x的最低有效字节，其他位均置0 [0x00000021]
+
+    `x = x&0xFF`
+
+ + 除了x的最低有效字节外，其他位置均取补，最低有效字节不变[0x789ABC21] 
+
+```c
+void fun1(int x){
+  int m = ~(x^x) - x;
+  int n = ~(x^x) - 0xFF;
+  m = m&n;
+  n = x&0xFF;
+  m += n;
+  show_int(m);
+  return;
+}
+```
+
+
+ + x的最低有效字节设置成全1，其他字节保持不变[0x876543FF]
+
+```c
+void fun2(int x){
+  int m = ~(x^x) - 0xFF;
+  int y = (x&m) + 0xff;
+  show_int(y);
+  return;
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
