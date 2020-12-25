@@ -324,9 +324,70 @@ void fun2(int x){
 ```
 
 
+4. ex2_13
+
+bis (位设置) 指令，提供数据字x和掩码字m，生成一个结果z，根据掩码m的位来修改x的位来得到z
+bic (位清楚)
+
+```c
+int bis(int x, int m);
+int bic(int x, int m);
+
+/* Compute x|y only use calls to func bis and bic */
+int bool_or(int x, int y){
+  int result = bis(x, y); // 将y为1对应的x的位全部设置为1即可
+  return result;
+}
+
+/* Compute x^y only use calls to func bis and bic */
+int bool_or(int x, int y){
+int bool_xor(int x, int y){
+  int result = ;
+  return result;
+}
+```
+
+### 2.1.8 C语言中的逻辑运算
+
+C语言还提供了一组逻辑运算符。(逻辑运算认为所有的非零参数都表示TRUE， 而参数0表示FALSE)
+
+|||
+|:-:|:-:|
+|运算符|命题逻辑|
+|\|\||OR|
+|&&|AND|
+|!|NOT|
+
+> 要注意区分逻辑运算和位运算
+
+
+--- 
+
+1. ex2_14
+
+
+2. ex2_15
+
+
+### 2.1.9 C语言中的移位运算
+
+
+`x << k`  x向左移动k位并丢弃最高的k位, 在右端补k个0
+
+`x >> k`  **逻辑右移** x向右移动k位并丢弃最低的k位, 在左端补k个0 
+
+`x >> k`  **算数右移** x向右移动k位并丢弃最低的k位, 在左端补k个最高有效位的值
+
+
+    几乎所有的编译器/机器组合都对有符号数使用算数右移
+    对于无符号数，右移必须是逻辑右移
+
+
+> 在许多机器上，移位指令通常只考虑 `k mod ω` ，也就是位移量的低 `log₂ω` 位
 
 
 
+## 2.2 整数表示
 
 
 
