@@ -408,7 +408,8 @@ C语言还提供了一组逻辑运算符。(逻辑运算认为所有的非零参
 
 ### 2.2.2 无符号数的编码
 
+**原理**：*无符号数编码的定义*
 
-![tupian](https://latex.codecogs.com/png.latex?\dpi{400}\int&space;\frac{1}{x}&space;dx&space;=&space;\ln&space;\left|&space;x&space;\right|&space;+&space;C)
+![](https://latex.codecogs.com/gif.latex?B2U_\omega(&space;\vec{x}&space;)&space;\doteq&space;\sum_{i=0}^{\omega%20-1}x_i2^i)
 
-...
+
