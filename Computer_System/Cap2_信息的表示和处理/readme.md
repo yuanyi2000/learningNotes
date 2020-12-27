@@ -1,3 +1,6 @@
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default"></script>
+
+
 # 第二章 信息的表示和处理
 
 *无符号* (unsigned) 基于传统的二进制表示法，表示大于或等于0的数字
@@ -179,11 +182,14 @@ show_bytes(valp, 2); // B
 show_bytes(valp, 3); // C
 ```
 
+
 |:-:|:-:|:-:|
 | |小端机器|大端机器|
+|:-:|:-:|:-:|
 |A:|21|21|
 |B:|21 43|21 43|
 |C:|21 43 65|21 43 65|
+
 
 2.
 ex2.6
