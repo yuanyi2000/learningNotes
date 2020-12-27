@@ -1,5 +1,3 @@
-<script src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML" type="text/javascript"></script>
-
 # 第二章 信息的表示和处理
 
 *无符号* (unsigned) 基于传统的二进制表示法，表示大于或等于0的数字
@@ -411,8 +409,7 @@ C语言还提供了一组逻辑运算符。(逻辑运算认为所有的非零参
 ### 2.2.2 无符号数的编码
 
 
- 
-$$ W_1^2 + W_2^2 = 0 $$
+
 
 
 
