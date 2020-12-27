@@ -20,11 +20,10 @@
 3. C语言
 	+ 数据结构（C语言）
 	+ Linux高级程序设计
-	+ [C++程序设计 Bjarne Stroustrup](https://github.com/yuanyi2000/Stroustrup-ppp-2e)
 
 
 4. C++
-	+[Stroustrup-ppp-2e](https://github.com/yuanyi2000/learningNotes/blob/master/Stroustrup-ppp-2e/Readme.md)
+	+ [Stroustrup-ppp-2e](https://github.com/yuanyi2000/learningNotes/blob/master/Stroustrup-ppp-2e/Readme.md)
 
 5. JS
 	+ [JavaScript高级程序设计](https://github.com/yuanyi2000/learningNotes/blob/master/JS/readme.md)
