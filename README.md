@@ -35,3 +35,6 @@
 
 7. 计算机安全
 	+ [计算机安全导论 杜文亮](https://github.com/yuanyi2000/learningNotes/blob/master/Computer_Security/readme.md)
+	
+	$$ W_1^3 \allpha = 0 \times $$
+
