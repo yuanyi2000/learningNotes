@@ -408,4 +408,4 @@ C语言还提供了一组逻辑运算符。(逻辑运算认为所有的非零参
 
 ### 2.2.2 无符号数的编码
 
-
+![1](http://latex.codecogs.com/svg.latex?\int_a^bf(x)\ dx)
