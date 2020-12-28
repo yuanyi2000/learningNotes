@@ -45,3 +45,60 @@ x86-64的机器代码中，一些对C程序员隐藏的处理器状态都是可�
 + 一组向量寄存器可以存放一个或多个整数或浮点数值
 
 
+### 3.2.2 代码示例
+
+例如我们写一段代码
+
+```c
+long mult2(long, long);
+
+void multstore(long x,long y, long *dest){
+    long t = mult2(x, y);
+    *dest = t;
+}
+```
+
+```sh
+linux$ gcc -Og -S mstore.c 
+```
+
+会得到mstore.s文件，其中包括下面几行
+
+```assembly
+multstore:
+	pushq	%rbx
+	movq	%rdx, %rbx
+	call	mult2@PLT
+	movq	%rax, (%rbx)
+	popq	%rbx
+	ret
+```
+
+如果使用gcc的`-c`选项，就会产生目标代码文件mstore.o
+
+```sh
+linux$ gcc -Og -c mstore.c 
+```
+
+> 要查看机器代码文件的内容。就要用到*反汇编器*
+
+```sh
+linux$ objdump -d mstore.o 
+```
+
+会得到下面的输出
+```assembly
+mstore.o：     文件格式 elf64-x86-64
+
+
+Disassembly of section .text:
+
+0000000000000000 <multstore>:
+   0:	53                   	push   %rbx
+   1:	48 89 d3             	mov    %rdx,%rbx
+   4:	e8 00 00 00 00       	callq  9 <multstore+0x9>
+   9:	48 89 03             	mov    %rax,(%rbx)
+   c:	5b                   	pop    %rbx
+   d:	c3                   	retq   
+```
+
