@@ -6,10 +6,11 @@
 
 ## 计算机 ##
 1. 常用的基本技巧
-	+ [Git](https://github.com/yuanyi2000/learningNotes/blob/master/Git/readme.md "Git")
+	+ [Git](https://github.com/yuanyi2000/learningNotes/blob/master/Git/readme.md)
 	+ Linux命令
-	+ [.MD语法入门](https://github.com/yuanyi2000/learningNotes/blob/master/MD/readme.md ".md语法入门")
+	+ [.MD语法入门](https://github.com/yuanyi2000/learningNotes/blob/master/MD/readme.md)
 	+ [正则表达式](https://github.com/cdoco/learn-regex-zh)
+	+ [vim](https://github.com/yuanyi2000/learningNotes/blob/master/vim/readme.md)
 
 2. 计算机基础知识
 	+ [深入理解计算机系统](https://github.com/yuanyi2000/learningNotes/tree/master/Computer_System)
@@ -38,3 +39,6 @@
 	+ [计算机安全导论 杜文亮](https://github.com/yuanyi2000/learningNotes/blob/master/Computer_Security/readme.md)
 	
 
+8. 其他笔记
+
+	
