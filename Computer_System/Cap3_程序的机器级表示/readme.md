@@ -102,3 +102,107 @@ Disassembly of section .text:
    d:	c3                   	retq   
 ```
 
+### 3.2.3 关于格式的注解
+
+```
+multstore:
+.LFB0:
+	.cfi_startproc
+	pushq	%rbx
+	.cfi_def_cfa_offset 16
+	.cfi_offset 3, -16
+	movq	%rdx, %rbx
+	call	mult2@PLT
+	movq	%rax, (%rbx)
+	popq	%rbx
+	.cfi_def_cfa_offset 8
+	ret
+```
+
+其中以`.`开头的行都是指导汇编器和链接器工作的伪指令
+
+
+旁注：
+1. ATT与Intel汇编代码格式
+
+gcc objdump等工具默认使用AT&T格式的汇编代码，但可以用以下命令生成Intel格式的汇编代码
+
+```sh
+linux$ gcc -Og -S -masm=intel mstore.c
+```
+
+```
+multstore:
+	push rbx
+	mov  rbx, rdx
+	call mult2 
+	mov  QWORD PTR [rbx], rax
+	pop  rbx
+	ret 
+```
+
++ Intel代码省略了指示大小的后缀，例如 `push mov` 而不是 `pushq movq` 
++ Intel代码省略了寄存器名字前面的 `%` , 例如 rbx 而不是 `%rbx` 
++ Intel代码用不同的方式描述内存中的位置，例如`QWORD PTR [rbx]`而不是`(%rbx)`
++ 在带有多个操作数的的指令情况下，列出的操作数的顺序相反
+
+2. 把C程序和汇编代码结合起来
+
+在C程序中插入汇编代码有两种方式
+
+ + 我们可以编写完整的函数，放进一个独立的汇编代码文件中，让汇编器和链接器把它和C程序文件合并起来
+
+ + 我们可以使用gcc的内联汇编特性，用`asm`伪指令可以在C程序中包含简短的汇编指令
+
+[IBM Linux中x86的内联汇编](https://www.ibm.com/developerworks/cn/linux/sdk/assemble/inline/index.html)
+
+
+
+## 3.3 数据格式
+
+
+
+	非常重要的表格
+
+
+
+|:-:|:-:|:-:|:-:|:-:|
+|C声明|Intel数据类型|汇编代码后缀|大小(字节)|大小(位)|
+|char|字节|b|1|8|
+|short|字|w|2|16|
+|int|双字|l|4|32|
+|long|四字|q|8|64|
+|char *|四字|q|8|64|
+|float|单精度|s|4|32|
+|double|双精度|l|8|64|
+
+
+> 后缀`l`既可以表示双字，也可以表示双精度浮点，这不会产生歧义，因为浮点数用的完全是另一组不同的指令和寄存器
+
+
+## 3.4 访问信息
+
+一个x86-64的中央处理单元(CPU)包含16个储存64位值的*通用目的寄存器*
+
+
+
+|:-|:-|:-|:-|:--:|
+|63............|31......|15...|7...0|用途|
+|%rax|%eax|%ax|%al|返回值|
+|%rbx|%ebx|%bx|%bl|被调用者保存|
+|%rcx|%ecx|%cx|%cl|第4个参数|
+|%rdx|%edx|%dx|%dl|第3个参数|
+|%rsi|%esi|%si|%sil|第2个参数|
+|%rdi|%edi|%di|%dil|第1个参数|
+|%rbp|%ebp|%bp|%bpl|被调用者保存|
+|%rsp|%esp|%sp|%spl|栈指针|
+|%r8|%r8d|%r8w|%r8b|第5个参数|
+|%r9|%r9d|%r9w|%r9b|第6个参数|
+|%r10|%r10d|%r10w|%r10b|调用者保存|
+|%r11|%r11d|%r11w|%r11b|调用者保存|
+|%r12|%r12d|%r12w|%r12b|被调用者保存|
+|%r13|%r13d|%r13w|%r13b|被调用者保存|
+|%r14|%r14d|%r14w|%r14b|被调用者保存|
+|%r15|%r15d|%r15w|%r15b|被调用者保存|
+
+其中最特别的时栈指针`%rsp`, 用来指明运行时栈的结束位置
