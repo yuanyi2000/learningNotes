@@ -37,7 +37,7 @@
 
 7. 计算机安全
 	+ [计算机安全导论 杜文亮](https://github.com/yuanyi2000/learningNotes/blob/master/Computer_Security/readme.md)
-	
+	+ [恶意代码分析实战](https://github.com/yuanyi2000/learningNotes/blob/master/Practical_Malware_Analysis/readme.md)
 
 8. 其他笔记
 
