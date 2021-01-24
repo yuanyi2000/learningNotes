@@ -264,8 +264,6 @@ long exchange(long *xp, long y){
 }
 ```
 
-[关于指针的理解](https://github.com/yuanyi2000/learningNotes/tree/master/Intermedia_C_Programming/Part1_%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%82%A8%E5%AD%98%EF%BC%9A%E5%86%85%E5%AD%98%E5%92%8C%E6%96%87%E4%BB%B6#%E6%8C%87%E9%92%88)
-
 ```assembly
 long exchange(long *xp, long y)
 xp in %rdi, y in %rsi
@@ -275,7 +273,56 @@ exchange:
 	ret
 ```
 
+---
+
+关于上面代码的说明：
+
+1. [指针](https://github.com/yuanyi2000/learningNotes/tree/master/Intermedia_C_Programming/Part1_%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%82%A8%E5%AD%98%EF%BC%9A%E5%86%85%E5%AD%98%E5%92%8C%E6%96%87%E4%BB%B6#%E6%8C%87%E9%92%88)
+   - `*iptr`在赋值号的右边
+     1. 把 iptr 的值看作是一个地址
+     2. 访问这个地址
+     3. 读取这个地址处的值
+     4. 把这个值赋值给左边
+   - `*iptr`在赋值号左边
+     1. 把 iptr 的值看作一个地址
+     2. 访问这个地址处的值
+     3. 把这个值修改为赋值号右边的值
+2. 汇编代码
+
+```assembly
+	movq (%rdi), %rax
+```
+
+    	左边是一个取地址运算，相当于把%rdi看作一个地址，访问这个地址处的值并赋值给%rax
+    	因此这相当于指针中*iptr在赋值号右边的情况，对应的也是下面的C代码
+
+```C
+	long x = *xp;
+```
+
+    	而对于
+
+```assembly
+	movq %rsi, (%rdi)
+```
+
+    	相当于把%rsi的值赋值给了把%rdi的值看作的一个地址处的值，因此相当于指针中
+    	*iptr在赋值号左边的情况
+
+```C
+	*xp = y;
+```
+
+> 综上，对于汇编代码中的数据传送对应的 C 代码的问题，只要联系指针的概念即可写出相应的代码
+
+> 形如`mov %rax, (%rdi)`的汇编代码对应 C 中的`*x = y` \
+> 形如`mov (%rax), %rdi`的汇编代码对应 C 中的`x = *y`
+
+---
+
 这段代码有两点值得注意：
 
 - C 语言中所谓的指针其实就是地址， 间接引用指针其实就是将该指针放在一个寄存器里， 然后内存引用使用这个寄存器
 - 像 x 这样的局部变量通常保存在寄存器而不是内存中，因为访问寄存器比访问内存快得多
+
+### 3.4.4 压入和弹出栈数据
