@@ -678,7 +678,7 @@ loop:
 
 当 x86-64 过程需要的存储空间超过了寄存器能够存放的大小的时候，就会在栈上分配空间。这个部分称为过程的*栈帧*。
 
-![](https://github.com/yuanyi2000/learningNotes/blob/master/Computer_System/Cap3_%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9C%BA%E5%99%A8%E7%BA%A7%E8%A1%A8%E7%A4%BA/code/stackframe.png)
+[![yi7v0U.png](https://s3.ax1x.com/2021/01/29/yi7v0U.png)](https://imgchr.com/i/yi7v0U)
 
     	当前正在执行的过程的帧总是在栈顶
 
