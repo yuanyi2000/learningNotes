@@ -199,8 +199,8 @@ multstore:
 1. _立即数(Imm, immediate)_， 用来表示常数值， 例如 `$0x1F $-517`
 2. _寄存器_， 表示某个寄存器的内容， 例如 `R[r]`
    r 表示寄存器，R[r]表示寄存器的值，这是将寄存器看做一个数组 R，用寄存器标识符作为索引
-3. *内存*引用， 根据计算出来的地址(_有效地址_)访问某个内存位置。 `M[Addr]`
-   表示对存储在内存中从 Addr 开始的字节引用
+3. *内存*引用， 根据计算出来的地址(_有效地址_)访问某个内存位置。
+   `M[Addr]`表示对存储在内存中从 Addr 开始的字节引用
 
 _寻址模式_ `Imm(rb, ri, s)` 表示 `M[Imm + R[rb] + R[ri]×s]`, 这个引用有四个部分，分别为
 
@@ -326,3 +326,400 @@ exchange:
 - 像 x 这样的局部变量通常保存在寄存器而不是内存中，因为访问寄存器比访问内存快得多
 
 ### 3.4.4 压入和弹出栈数据
+
+栈指针`%rsp`保存着栈顶元素的地址
+
+- `pushq S`
+
+  R[%rsp] <- R[%rsp]-8;
+  M[ R[%rsp] ] <- S
+  将四字压入栈
+
+  (R[r]表示寄存器的值，M[Addr]表示对储存在 Addr 处的一段字节值的引用)
+
+- `popq D`
+
+  D <- M[ R[%rsp] ];
+  R[%rsp] <- R[%rsp]+8
+
+一般来说，栈向下增长(增长方向是地址减小的方向)，具体可以 Google 一下
+
+## 3.5 算数和逻辑操作
+
+算数和逻辑操作被分成四组，分别为
+
+- 加载有效地址
+
+|   指令    |  操作   |     描述     |
+| :-------: | :-----: | :----------: |
+| leaq S, D | D <- &S | 加载有效地址 |
+
+- 一元操作
+
+| 指令  |  操作   | 描述 |
+| :---: | :-----: | :--: |
+| INC D |   D++   |  +1  |
+| DEC D |   D--   |  -1  |
+| NEG D | D <- -D | 取负 |
+| NOT D | D <- ~D | 取补 |
+
+- 二元操作
+
+|   指令    |    操作     | 描述 |
+| :-------: | :---------: | :--: |
+| ADD S, D  | D <- D + S  |  加  |
+| SUB S, D  | D <- D - S  |  减  |
+| IMUL S, D | D <- D \* S |  乘  |
+| XOR S, D  | D <- D ^ S  | 异或 |
+|  OR S, D  | D <- D \| S |  或  |
+| AND S, D  | D <- D & S  |  与  |
+
+- 移位
+
+|   指令   |      操作      |   描述   |
+| :------: | :------------: | :------: |
+| SAL k, D |  D <- D << k   |   左移   |
+| SHL k, D |  D <- D << k   |   左移   |
+| SAR k, D | D -> D >>(A) k | 算数右移 |
+| SHR k, D | D -> D >>(L) k | 逻辑右移 |
+
+### 3.5.1 加载有效地址
+
+- 编译器经常发现 leaq 有一些与有效地址计算根本无关的灵活用法 (其目的操作数必须为寄存器)
+
+```C
+long scale(long x, long y, long z)
+{
+	long t = x + 4 * y + 12 * z;
+	return t;
+}
+```
+
+```assembly
+long scale(long x, long y, long z)
+x in %rdi, y in %rsi, z in %rdx
+
+scale:
+	leaq (%rdi, %rsi, 4), %rax		x + 4*y
+	leaq (%rdx, %rdx, 2), %rdx		z + 2*z = 3*z
+	leaq (%rax, %rdx, 4), %rax		(x+4*y) + 4*(3*z) = x + 4*y + 12*z
+	ret
+```
+
+### 3.5.2 一元和二元操作
+
+- 一元操作
+
+  - 该操作数既可以是内存位置也可以是寄存器
+  - 类似 C 语言中的 ++ -- 运算符
+
+- 二元操作
+
+  - 源操作数是第一个，目的操作数是第二个
+  - 源操作数可以是内存、立即数或寄存器， 目的操作数可以是内存位置或寄存器
+
+> 当第二个操作数为内存地址时，处理器必须从内存中读出值，执行操作，再把值写回
+
+### 3.5.3 移位操作
+
+    	算数移位填充符号位
+    	而逻辑移位填充0
+
+### 3.5.4 讨论
+
+### 3.5.5 特殊的算术操作
+
+| 指令    | 效果                                                             | 描述         |
+| :------ | :--------------------------------------------------------------- | :----------- |
+| imulq S | R[%rdx]: R[%rax] <- S \* R[%rax]                                 | 有符号全乘法 |
+| mulq S  | R[%rdx]: R[%rax] <- S \* R[%rax]                                 | 无符号全乘法 |
+|         |                                                                  |              |
+| clto    | R[%rdx]: R[%rax] <- 符号扩展(R[%rax])                            | 转换为八字   |
+|         |                                                                  |              |
+| idivq S | R[%rdx] <- R[%rdx]:R[%rax] mod S, R[%rdx] <- R[%rdx]:R[%rax] / S | 有符号除法   |
+| divq S  | R[%rdx] <- R[%rdx]:R[%rax] mod S, R[%rdx] <- R[%rdx]:R[%rax] / S | 无符号除法   |
+|         |                                                                  |              |
+| cqto    | 将%rdx 的位设置为全 0(无符号运算)或%rax 的符号位(有符号运算)     | 置零         |
+
+- 乘法运算的 C 代码和汇编代码示例
+
+```C
+#include <inttypes.h>
+
+typedef unsigned __int128 uint128_t;
+
+void store_uprod(uint128_t *dest, uint64_t x, uint64_t y)
+{
+	*dest = x * (uint128_t) y;
+}
+```
+
+```assembly
+void store_uprod(uint128_t *dest, uint64_t x, uint64_t y)
+dest in %rdi, x in %rsi, y in %rdx
+store_uprod:
+	movq %rsi, %rax		Copy x to multiplicand
+	mulq %rdx			Multiply by y
+	movq %rax, (%rdi)	Store lower 8 bytes at dest
+	movq %rdx, 8(%rdi)	Store upper 8 bytes at dest + 8
+	ret
+```
+
+- 除法运算的 C 代码和汇编代码示例
+
+```C
+void remdiv(long x, long y, long *qp, long *rp)
+{
+	long q = x / y;
+	long r = x % y;
+	*qp = q;
+	*rp = r;
+}
+```
+
+```assembly
+void remdiv(long x, long y, long *qp, long *rp)
+x in %rdi, y in %rsi, qp in %rdx, rp in %rcx
+remdiv:
+	movq %rdx, %r8		Copy qp
+	movq %rdi, %rax		Move x to lower 8 bytes of dividend
+	cqto				Sign-extend to upper 8 bytes of dividend
+	idivq %rsi			Divided by y
+	movq %rax, (%r8)	Store quotient at qp
+	movq %rdx, (%rcx)	Store remainder at rp
+	ret
+```
+
+## 3.6 控制
+
+### 3.6.1 条件码
+
+*条件码寄存器(condition code register)*描述了最近操作的算术或逻辑操作的属性
+
+- CF 进位标志 最近的操作使高位产生了进位，用来检查无符号操作的溢出
+- ZF 零标志 最近的操作结果为 0
+- SF 符号标志 最近的操作结果为负数
+- OF 溢出标志 最近的操作导致一个补码溢出--正溢出或负溢出
+
+      leaq不改变任何条件码
+      对于逻辑操作，CF和OF会设置为0
+      INC和DEC会设值OF和ZF，但不会改变CF
+
+比较和测试指令，这些指令只改变条件码
+
+| 指令        |  基于   | 描述 |
+| :---------- | :-----: | :--- |
+| CMP S1, S2  | S2 - S1 | 比较 |
+| TEST S1, S2 | S1 & S2 | 测试 |
+
+    	CMP  指令与 SUB 的行为是一样的
+    	TEST 指令与 AND 的行为是一样的
+    	但是他们都不会改变除了条件码以外的寄存器的值
+
+### 3.6.2 访问条件码
+
+条件码不会直接读取，常用的访问方式有三种
+
+1. 可以根据条件码的某种组合，将一个字节设置为 0 或 1
+2. 可以条件跳转到程序的某个部分
+3. 可以有条件的传送数据
+
+- SET 指令
+
+      一条SET指令的目的操作数是低位单字节寄存器元素之一 ，
+      或者是一个字节的内存位置，指令会将其设置为0 或 1
+
+| 指令    | 效果              | 设置条件 |
+| :------ | :---------------- | :------- |
+| sete D  | D <- ZF           | ==       |
+| setne   | D <- ~ZF          | !=       |
+|         |                   |          |
+| sets D  | D <- SF           | <0       |
+| setns D |                   |          |
+|         |                   |          |
+| setg D  | D <- ~(SF^OF)&~ZF | > 有符号 |
+| setge D |                   |
+| setl D  |                   |
+| setle D |                   |
+|         |                   |          |
+| seta D  |                   | > 无符号 |
+| setae D |                   |
+| setb D  |                   |
+| setbe D |                   |
+
+> 详情见 《深入理解计算机系统》 P138
+
+### 3.6.3 跳转指令
+
+跳转指令分为以下
+
+- jmp
+
+  jmp Label
+  jmp \*Operand
+
+- je jne
+
+  是否相等
+
+- js jns
+
+  是否为负数
+
+- jg jge jl jle
+
+  有符号数
+
+- ja jae jb jbe
+
+  无符号数
+
+### 3.6.4 跳转指令的编码
+
+    	理解跳转指令的编码问题，对研究链接非常重要
+
+跳转指令的编码方式
+
+1.  PC-relative
+
+        将目标指令的地址与紧跟在跳转指令后面那条指令的地址之间的差作为编码
+
+2.  绝对地址编码
+
+        用四个字节直接指定目标
+
+> `rep; ret`的组合可以使代码再 AMD 上运行的更快，因为它避免了 ret 指令成为条件跳转指令的目标
+
+理解 PC 相对寻址：
+
+假设有一段汇编代码
+
+```assembly
+ADDR1	eb XX 		jmp xxxxx
+ADDR2   48 d1 f8	xxxxxxxxx
+```
+
+    	对于ADDR1处的jmp指令，想确定他要跳转到的指令，需要先找到下一条指令的地址
+    	也就是ADDR2，之后，要跳转的目标指令的地址即是
+    	ADDR2 + XX
+    	（XX可以是补码负数）
+
+### 3.6.5 | 3.6.6 实现条件分支
+
+1. 条件控制
+
+2. 条件传送
+
+用条件赋值实现计算两个数差的绝对值
+
+```C
+long cmovdiff(long x, long y)
+{
+	long rval = x - y;
+	long eval = y - x;
+	long ntest = x >= y;
+
+	if(ntest) rval = eval;
+	return eval;
+}
+```
+
+```assembly
+x in %rdi, y in %rsi
+absdiff:
+	movq %rsi, %rax
+	subq %rdi, %rax		rval = y - x
+	movq %rdi, %rdx
+	subq %rsi, %rdx		eval = x - y
+	cmpq %rsi, %rdi
+	cmovge %rdx, %rax
+	ret
+```
+
+    	处理器通过使用流水线来获得高性能
+    	在流水线中，一条指令的处理要经过多阶段，例如
+    	从内存取指令，确定指令的类型，从内存读取数据，执行算数运算，向内存写数据，更新程序计数器
+    	这种方法通过重叠连续指令的步骤来获得高性能
+    	例如，在取下一条指令的同时执行上一条指令的算数运算。
+
+    	当遇到条件跳转时，只有当分支条件求值完成后，才会决定分支往那边走
+    	处理器采用非常精密的分支预测逻辑来猜测每条跳转指令是否会执行
+    	而一旦预测错误，会导致很严重的惩罚，导致程序性能下降
+
+条件传送指令：当条件满足时，将源值 S 复制到目的 R
+
+`CMOVX S, R`
+
+    	X 是e(相等)， ne(不等)， s(负数) ...
+
+### 3.6.7 循环
+
+1. do-while
+
+```
+loop:
+	body-statement
+	t = test-expr;
+	if (t)
+		goto loop;
+```
+
+## 3.7 过程
+
+    	过程的形式多样，函数、方法、子例程、处理函数等，但是他们有一些共有的特性
+
+- 传递控制
+
+- 传递数据
+
+- 分配和释放内存
+
+### 3.7.1 运行时栈
+
+当 x86-64 过程需要的存储空间超过了寄存器能够存放的大小的时候，就会在栈上分配空间。这个部分称为过程的*栈帧*。
+
+!()[https://github.com/yuanyi2000/learningNotes/tree/master/Computer_System/Cap3_%E7%A8%8B%E5%BA%8F%E7%9A%84%E6%9C%BA%E5%99%A8%E7%BA%A7%E8%A1%A8%E7%A4%BA/code/stackframe.png]
+
+    	当前正在执行的过程的帧总是在栈顶
+
+    	大多数过程的帧都是定长的，在过程开始前就已经分配好了
+
+### 3.7.2 转移控制
+
+    	在由过程P进入过程Q的时候，程序计数器必须设置为Q的代码的起始位置，然后在返回时，
+    	要把程序计数器设置为P中调用Q后面那条指令
+
+例如有以下反汇编代码
+
+```assembly
+1	0000000000400540 <multstore>:
+2	  400540:  53					push %rbx
+3	  400541:  48 89 d3				mov  %rdx, %rbx
+4	  40054d:  c3					retq
+
+5	  400563:  e8 d8 ff ff ff 		callq 400540 <multstore>
+6	  400568:  48 8b 54 24 08		mov  0x8(%rsp), %rdx
+```
+
+运行时栈寄存器和程序计数器的状态：
+
+1. 执行 call
+
+```
+%rip	0x400563
+%rsp	0x7fffffffe840
+```
+
+2. call 执行之后
+
+```
+%rip	0x400540
+%rsp	0x7fffffffe838
+```
+
+3. ret 执行之后
+
+```
+%rip	0x400568
+%rsp	0x7fffffffe840
+```
