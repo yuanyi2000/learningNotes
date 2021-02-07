@@ -385,7 +385,7 @@ C 语言还提供了一组逻辑运算符。(逻辑运算认为所有的非零�
 
 1. **原理**：_无符号数编码的定义_
 
-![](<https://latex.codecogs.com/gif.latex?B2U_\omega(&space;\vec{x}&space;)&space;\doteq&space;\sum_{i=0}^{\omega%20-1}x_i2^i>)
+[![yk33PP.gif](https://s3.ax1x.com/2021/01/30/yk33PP.gif)](https://imgchr.com/i/yk33PP)
 
 2. **原理**: _无符号数编码的唯一性_
 
