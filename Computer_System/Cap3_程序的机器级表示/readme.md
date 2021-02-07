@@ -6,6 +6,10 @@
 
 Intel 处理器系列俗称 x86，经历了一个长期的不断发展的过程。
 
+> X86 是由 Intel 推出的一种复杂指令集,用于控制芯片的运行的程序
+
+[x86 架构 百度百科](https://baike.baidu.com/item/X86%E6%9E%B6%E6%9E%84/7470217?fr=aladdin)
+
 ## 3.2 程序编码
 
 `linux $ gcc -Og -o p p1.c p2.c `
@@ -24,8 +28,11 @@ Intel 处理器系列俗称 x86，经历了一个长期的不断发展的过程�
 
 对于机器级编程来说，有两种抽象尤其重要
 
-1. 指令集体系结构或指令集架构(Instruction Set Architecture, ISA)\*来定义机器级程序的格式和行为
-2. 第二种是，机器级程序使用的内存地址是虚拟地址
+1.  指令集体系结构或指令集架构(Instruction Set Architecture, ISA)来定义机器级程序的格式和行为
+
+        ISA定义了一台计算机可以执行的所有指令的集合，每条指令规定了计算机执行什么操作，所处理的操作数存放的地址空间以及操作数类型。ISA规定的内容包括数据类型及格式，指令格式，寻址方式和可访问地址空间的大小，程序可访问的寄存器个数、位数和编号，控制寄存器的定义，I/O空间的编制方式，中断结构，机器工作状态的定义和切换，输入输出结构和数据传送方式，存储保护方式等。因此，可以看出，指令集体系结构是指软件能够感知到的部分，也称软件可见部分。
+
+2.  第二种是，机器级程序使用的内存地址是虚拟地址
 
 x86-64 的机器代码中，一些对 C 程序员隐藏的处理器状态都是可见的
 
@@ -65,6 +72,12 @@ multstore:
 	popq	%rbx
 	ret
 ```
+
+    	pushq %rbx 的作用是保存%rbx的值，因为接下来mulstore函数要用到%rbx，但其中可能有main使用到的值
+
+    	movq %rdx, %rbx 将dest的值放进%rbx保存起来，因为调用mult2之后还要用到dest的值，调用之前应该保存到被调用者保存寄存器中
+
+    	也就是说对于一个过程，在调用其他过程时需要用到被调用者保存寄存器时，首先要将其寄存器的值保存起来才能用
 
 如果使用 gcc 的`-c`选项，就会产生目标代码文件 mstore.o
 
@@ -166,6 +179,8 @@ multstore:
 
 > 后缀`l`既可以表示双字，也可以表示双精度浮点，这不会产生歧义，因为浮点数用的完全是另一组不同的指令和寄存器
 
+> 一个字节是两个 16 进制数，也就是八个 2 进制数
+
 ## 3.4 访问信息
 
 一个 x86-64 的中央处理单元(CPU)包含 16 个储存 64 位值的*通用目的寄存器*
@@ -241,17 +256,17 @@ _寻址模式_ `Imm(rb, ri, s)` 表示 `M[Imm + R[rb] + R[ri]×s]`, 这个引用
 _理解数据传送如何改变目标寄存器_
 
 ```assembly
-movabsq $0x0011223344556677, %rax		%rax = 0011223344556677
-movb	$-1, %al						%rax = 00112233445566FF
-movw	$-1, %ax						%rax = 001122334455FFFF
-movl	$-1, %eax						%rax = 00000000FFFFFFFF
-movq    $-1, %rax						%rax = FFFFFFFFFFFFFFFF
+movabsq $0x0011223344556677, %rax			%rax = 0011223344556677
+movb	$-1, %al							%rax = 00112233445566FF
+movw	$-1, %ax							%rax = 001122334455FFFF
+movl	$-1, %eax							%rax = 00000000FFFFFFFF
+movq    $-1, %rax							%rax = FFFFFFFFFFFFFFFF
 
-movabsq $0x0011223344556677, %rax		%rax = 0011223344556677
-movb 	$0xAA, %dl						%dl  = AA
-movb 	%dl, %al						%rax = 00112233445566AA
-movsbq  %dl, %rax						%rax = FFFFFFFFFFFFFFAA
-movzbq  %dl, %rax						%rax = 00000000000000AA
+movabsq $0x0011223344556677, %rax			%rax = 0011223344556677
+movb 	$0xAA, %dl							%dl  = AA
+movb 	%dl, %al							%rax = 00112233445566AA
+movsbq  %dl, %rax							%rax = FFFFFFFFFFFFFFAA
+movzbq  %dl, %rax							%rax = 00000000000000AA
 ```
 
 ### 3.4.3 数据传送示例
@@ -723,3 +738,248 @@ loop:
 %rip	0x400568
 %rsp	0x7fffffffe840
 ```
+
+### 3.7.3 数据传送
+
+    	可以通过寄存器最多传递 6 个整型参数
+    	寄存器的使用顺序为：%rdi %rsi %rdx %rcx %r8 %r9
+    	当传递的位数是 32 位时使用%edi %esi....16 位时是%di %si....8 位则为%dil %sil...
+
+    	超出6个的部分要用栈来传递，第七个参数位于栈顶
+    	参数到位之后，才调用call指令传递控制
+
+    	当被调用的过程友调用了新的超过6个参数的函数时
+    	他也需要在自己的栈帧中为超出6个的部分分配空间
+    	即为栈帧中的参数构造区
+
+来看一个示例
+
+```C
+void proc(long a1, long *a1p,
+		  int a2, int *a2p,
+		  short a3, short *a3p,
+		  char a4, char *a4p)
+{
+	*a1p += a1;
+	*a2p += a2;
+	*a3p += a3;
+	*a4p += a4;
+}
+```
+
+```assembly
+void proc(a1, a1p, a2, a2p, a3, a3p, a4, a4p)
+a1	in %rdi		(64bit)
+a1p in %rsi		(64bit)
+a2 	in %edx		(32bit)
+a2p in %rcx		(64bit)
+a3	in %r8w		(16bit)
+a3p	in %r9		(64bit)
+a4	in %rsp+8	( 8bit)
+a4p in %rsp+16	(64bit)
+proc:
+	movq	16(%rsp), %rax		Fetch a4p
+	addq	%rdi, %rsi			*a1p += a1
+	addl 	%edx, (%rcx)		*a2p += a2
+	addw	%r8w, (%r9)			*a3p += a3
+	movl	8(%rsp), %edx		Fetch a4
+	addb	%dl, (%rax)			*a4p += a4
+	ret
+```
+
+    	a4 a4p 的值不能直接使用，而是应该放到寄存器里使用
+
+### 3.7.4 栈上的局部储存
+
+有些时候，局部数据必须放在内存中：
+
+- 寄存器不足够存放所有的本地数据
+- 对一个局部变量使用取地址运算符&， 因此必须能够为他产生一个地址
+- 某些局部变量是数组或结构， 因此必须能够通过数组或结构引用被访问到
+
+示例：
+
+```C
+long swap_add(long *xp, long *yp)
+{
+	long x = *xp;
+	long y = *yp;
+	*xp = y;
+	*yp = x;
+	return x + y;
+}
+long caller()
+{
+	long arg1 = 534;
+	long arg2 = 1057;
+	long sum = swap_add(&arg1, &arg2);
+	long diff = arg1 - arg2;
+	return sum * diff;
+}
+```
+
+```assembly
+long caller()
+caller:
+	subq 	$16, %rsp		Allocate 16 bytes for stack frame
+	movq 	$534, (%rsp)
+	movq	$1057, 8(%rsp)
+	leaq	8(%rsp), %rsi	Compute &arg2 as second argument
+	movq	%rsp, %rdi		Compute &arg1 as first  argument
+	call 	swap_add
+	movq	(%rsp), %rdx
+	subq	8(%rsp), %rdx
+	imulq	%rdx, %rax
+	addq 	$16, %rsp		Deallocate stack frame
+	ret
+```
+
+---
+
+示例 2， 调用#3.7.3 中 proc 的代码示例，该代码创建了一个栈帧
+
+```C
+long call_proc()
+{
+	long x1 = 1; int x2 = 2;
+	short x3 = 3; char x4 = 4;
+	proc(x1, &x1, x2, &x2, x3, &x3, x4, &x4);
+	return (x1+x2)*(x3+x4);
+}
+```
+
+```assembly
+long call_proc()
+call_proc:
+	set up argument to proc
+	subq	$32, %rsp				Allocate 32 bytes stack frame
+	movq 	$1, 24(%rsp)			store 1 in &x1
+	movl	$2, 20(%rsp)			store 2 in &x2
+	movw	$3, 18(%rsp)			store 3 in &x3
+	movb	$4, 17(%rsp)			store 4 in &x4
+	leaq	17(%rsp), %rax			create &x4
+	movq	%rax, 8(%rsp)			store &x4 as arg8
+	movl	$4, (%rsp)				store 4 as arg7
+	leaq	18(%rsp), %r9			pass &x3 as arg6
+	movl	$3, %r8d
+	leaq	20(%rsp), %rcx
+	movl	$2, %edx
+	leaq	24(%rsp), %rsi
+	movl	$1, %edi
+
+	call	proc
+
+	movslq	20(%rsp), %rdx
+	addq	24(%rsp), %rdx
+	movswl	18(%rsp), %eax
+	movsbl	17(%rsp), %ecx
+	subl	%ecx, %eax
+	cltq
+	imulq	%rdx, %rax
+	addq	$32, %rsp
+	ret
+```
+
+### 3.7.5 寄存器的局部存储空间
+
+    	寄存器是唯一被所有过程共享的资源
+
+    	x86-64采用了一组统一的寄存器使用惯例来保证被调用者不会覆盖到调用者稍后会使用的寄存器
+
+    	根据惯例，寄存器 %rbx,%rbp,%r12~%r15被划分为被调用者保存寄存器
+    	当过程P调用过程Q时，Q必须保存这些寄存器的值，保证他们的值在Q返回P时和P调用Q时是一样的
+    	Q保存一个寄存器的值不变，要么不去改变它，要么把原始值压入栈中，在返回前再弹出旧值
+
+    	所有其他寄存器，除了%rsp，都分类为调用者保存寄存器，这意味着任何函数都能修改他们
+    	如果过程P在这类寄存器中有局部数据，那么调用过程Q之前保存好他是P的责任
+
+示例：
+
+```C
+long P(long x, long y)
+{
+	long u = Q(y);
+	long v = Q(x);
+	return u + x;
+}
+```
+
+```assembly
+long P(x, y)
+x in %rdi, y in %rsi
+P:
+	pushq 	%rbp
+	pushq 	%rbx
+	subq	$8, %rsp		Allign stack frame
+	movq	%rdi, %rbp		Save x
+	movq	%rsi, %rdi		Move y to first argument
+	call 	Q
+	movq	%rax, %rbx		Save resault
+	movq	%rbp, %rdi		Move x to first argument
+	call 	Q
+	addq	%rbp, %rax
+	addq	$8, %rsp		Deallocate last part of stack
+	popq	%rbx
+	popq	%rbp
+	ret
+```
+
+> 第一次调用中，必须保存 x 的值，第二次要保存 Q(y)的值
+> P 要使用 %rbp 和 %rbx， 但其中有可能有 mian 函数的数据因此必须先将他们的值压入栈中才能使用
+> P 的最后还要使用 pop 指令将他们恢复
+
+### 3.6.7 递归过程
+
+    	寄存器和栈的惯例使得x86-64过程可以递归的调用他们自身
+    	每个过程调用在栈中有他们独有的空间，因此多个未完成的调用的局部变量不会相互影响
+    	此外栈适当的策略是过程调用时分配局部存储，返回时释放存储
+
+阶乘递归的代码
+
+```C
+int rfact(long n)
+{
+	long result;
+	if(n <= 1)
+		result = 1;
+	else
+		result = n * rfact(n-1);
+	return result;
+}
+```
+
+```assembly
+long rfact(long)
+n in %rdi
+rfact:
+	pushq	%rbx
+	movq	%rdi, %rbx
+	movl	$1, %eax
+	cmpq	$1,	%rdi
+	jle	.L35
+	leaq	-1(%rdi), %rdi
+	call	rfact
+	imulq	%rbx, %rax
+.L35:
+	popq	%rbx
+	ret
+```
+
+## 3.8 数组的分配和访问
+
+对于数据类型 T 和整型常数 N，声明如下：
+
+`T A[N]`
+
+起始位置表示为 xA
+
+    	这个声明有两个效果
+    	首先，在内存中分配了 sizeof(T)*N 字节的连续区域
+    	其次，引入了标识符A，可以用A来作为指向数组开头的指针(xA)
+
+|    声明     | 元素大小 | 总的大小 | 起始地址 | 元素 i |
+| :---------: | :------: | :------: | :------: | :----: |
+| char A[12]  |    1     |    12    |    xA    |  xA+i  |
+| char \*B[8] |    8     |    64    |    xB    |  xB+i  |
+
+### 3.8.2 指针运算
